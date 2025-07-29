@@ -90,7 +90,7 @@ var ankiGetDecksNamesResponse = await httpClient.PostAsync(ankiUrl, ankiGetDecks
 ankiGetDecksNamesResponse.EnsureSuccessStatusCode();
 
 var decksNamesString = await ankiGetDecksNamesResponse.Content.ReadAsStringAsync();
-var decksNameList = JsonSerializer.Deserialize<AnkiErrorResponse>(decksNamesString);
+var decksNameList = JsonSerializer.Deserialize<AnkiResponse<List<string>>>(decksNamesString);
 
 if (decksNameList?.Error is not null)
 {
@@ -179,7 +179,7 @@ var ankiAddNoteResponse = await httpClient.PostAsync(ankiUrl, ankiAddNoteContent
 ankiAddNoteResponse.EnsureSuccessStatusCode();
 
 var ankiAddNotesStringResult = await ankiAddNoteResponse.Content.ReadAsStringAsync();
-var ankiAddNotesResult = JsonSerializer.Deserialize<AnkiErrorResponse>(ankiAddNotesStringResult);
+var ankiAddNotesResult = JsonSerializer.Deserialize<AnkiResponse<List<long>>>(ankiAddNotesStringResult);
 
 if (ankiAddNotesResult?.Error is not null)
 {
