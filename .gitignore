@@ -1,0 +1,13 @@
+.vs/
+bin/
+obj/
+
+.idea/
+.vscode/
+
+packages/
+
+appsettings.json
+.env
+
+*.log
