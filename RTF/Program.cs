@@ -1,17 +1,24 @@
 ﻿using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using RTF;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using RTF.Models;
 
-if (args.Length > 1)
+Console.WriteLine("Hey. What is the file path to generate the flashcards?");
+
+var filePath = Console.ReadLine();
+
+while (string.IsNullOrEmpty(filePath))
 {
-    Console.WriteLine("Only accept one arg.");
-
-    return;
+    Console.WriteLine("File path can't be blank. What is the file path to generate the flashcards?");
+    filePath = Console.ReadLine();
 }
 
-var currentDirectory = Directory.GetCurrentDirectory();
-var path = $"{currentDirectory}/{args[0]}";
+var userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+var path = $"{userRootPath}\\{filePath}";
 
 var fileExists = File.Exists(path);
 
@@ -31,11 +38,18 @@ if (string.IsNullOrEmpty(summary))
     return;
 }
 
-var geminiOptions = new GeminiOptions
-{
-    ApiKey = Environment.GetEnvironmentVariable("GeminiOptions:ApiKey") ?? string.Empty,
-    Url = Environment.GetEnvironmentVariable("GeminiOptions:Url") ?? string.Empty
-};
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureAppConfiguration((context, config) =>
+    {
+        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+    })
+    .ConfigureServices((context, services) =>
+    {
+        services.Configure<GeminiOptions>(context.Configuration.GetSection("GeminiOptions"));
+    })
+    .Build();
+
+var geminiOptions = host.Services.GetRequiredService<IOptions<GeminiOptions>>().Value;
 
 if (string.IsNullOrEmpty(geminiOptions.ApiKey))
 {
@@ -71,13 +85,20 @@ var ankiRequestGetDecksName = new AnkiRequestGetDecksName
 
 var ankiGetDecksNameContent =
     new StringContent(JsonSerializer.Serialize(ankiRequestGetDecksName), Encoding.UTF8, "application/json");
-var ankiGetDecksNamesResponse = await httpClient.PostAsJsonAsync(ankiUrl, ankiGetDecksNameContent);
+var ankiGetDecksNamesResponse = await httpClient.PostAsync(ankiUrl, ankiGetDecksNameContent);
 
 ankiGetDecksNamesResponse.EnsureSuccessStatusCode();
 
 var decksNamesString = await ankiGetDecksNamesResponse.Content.ReadAsStringAsync();
 var decksNameList = JsonSerializer.Deserialize<AnkiResponseGetDecksName>(decksNamesString);
 var containsDeck = decksNameList != null && decksNameList.Result.Contains(deckName);
+
+if (!string.IsNullOrEmpty(decksNameList?.Error))
+{
+    Console.WriteLine($"Erro while getting the decks name: {decksNameList.Error}");
+
+    return;
+}
 
 if (!containsDeck)
 {
@@ -99,7 +120,7 @@ if (!containsDeck)
         if (string.IsNullOrEmpty(renameDeck) || renameDeck.Equals("n", StringComparison.OrdinalIgnoreCase))
             return;
 
-        if (renameDeck.Equals("s", StringComparison.OrdinalIgnoreCase))
+        if (renameDeck.Equals("y", StringComparison.OrdinalIgnoreCase))
         {
             Console.WriteLine("New deck name:");
 
@@ -176,6 +197,6 @@ var ankiRequestAddNote = new AnkiRequestAddNote
 
 var ankiAddNoteContent =
     new StringContent(JsonSerializer.Serialize(ankiRequestAddNote), Encoding.UTF8, "application/json");
-var ankiAddNoteResponse = await httpClient.PostAsJsonAsync(ankiUrl, ankiAddNoteContent);
+var ankiAddNoteResponse = await httpClient.PostAsync(ankiUrl, ankiAddNoteContent);
 
 ankiAddNoteResponse.EnsureSuccessStatusCode();
