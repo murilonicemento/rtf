@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace RTF;
+namespace RTF.Models;
 
 public class AnkiRequestGetDecksName
 {

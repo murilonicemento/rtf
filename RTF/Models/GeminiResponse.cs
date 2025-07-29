@@ -1,4 +1,4 @@
-﻿namespace RTF;
+﻿namespace RTF.Models;
 
 public class GeminiResponse
 {

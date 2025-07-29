@@ -1,7 +1,9 @@
-﻿namespace RTF;
+﻿using System.Text.Json.Serialization;
+
+namespace RTF.Models;
 
 public class AnkiResponseGetDecksName
 {
-    public List<string> Result { get; set; }
-    public string Error { get; set; }
+    [JsonPropertyName("result")] public string[] Result { get; set; }
+    [JsonPropertyName("error")] public string Error { get; set; }
 }
