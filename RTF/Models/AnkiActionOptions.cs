@@ -3,7 +3,7 @@
 public enum AnkiActionOptions
 {
     DeckNames,
-    AddNote,
+    AddNotes,
 }
 
 public static class AnkiActionOptionsExtensions
@@ -13,7 +13,7 @@ public static class AnkiActionOptionsExtensions
         return action switch
         {
             AnkiActionOptions.DeckNames => "deckNames",
-            AnkiActionOptions.AddNote => "addNote",
+            AnkiActionOptions.AddNotes => "addNotes",
             _ => throw new ArgumentOutOfRangeException(nameof(action), action, null)
         };
     }

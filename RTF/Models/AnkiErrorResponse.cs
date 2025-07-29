@@ -2,8 +2,8 @@
 
 namespace RTF.Models;
 
-public class AnkiResponseGetDecksName
+public class AnkiErrorResponse
 {
     [JsonPropertyName("result")] public string[] Result { get; set; }
-    [JsonPropertyName("error")] public string Error { get; set; }
+    [JsonPropertyName("error")] public string? Error { get; set; }
 }
