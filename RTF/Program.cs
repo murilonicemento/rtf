@@ -14,6 +14,13 @@ if (args.Length == 0 || args[0] != "generate")
     return;
 }
 
+Console.ForegroundColor = ConsoleColor.Yellow;
+Console.WriteLine("⚠️");
+Console.WriteLine("Make sure Anki is running and AnkiConnect is enabled.");
+Console.WriteLine("The application expects AnkiConnect to be accessible at http://localhost:8765.");
+Console.WriteLine("⚠️");
+Console.ResetColor();
+
 Console.WriteLine("Hey. What is the file path to generate the flashcards?");
 
 var filePath = Console.ReadLine();
