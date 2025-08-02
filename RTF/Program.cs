@@ -7,6 +7,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using RTF.Models;
 
+if (args.Length == 0 || args[0] != "generate")
+{
+    Console.WriteLine("Comando não reconhecido.");
+
+    return;
+}
+
 Console.WriteLine("Hey. What is the file path to generate the flashcards?");
 
 var filePath = Console.ReadLine();
