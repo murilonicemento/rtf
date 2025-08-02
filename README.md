@@ -1,4 +1,4 @@
-﻿# Documentação do Programa de Geração de Flashcards para Anki
+﻿# Documentação RTF (Resume To Flashcard)
 
 ## Descrição Geral
 
