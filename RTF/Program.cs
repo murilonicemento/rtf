@@ -15,10 +15,31 @@ if (args.Length == 0 || args[0] != "generate")
 }
 
 Console.ForegroundColor = ConsoleColor.Yellow;
-Console.WriteLine("⚠️");
-Console.WriteLine("Make sure Anki is running and AnkiConnect is enabled.");
-Console.WriteLine("The application expects AnkiConnect to be accessible at http://localhost:8765.");
-Console.WriteLine("⚠️");
+
+var messageLines = new[]
+{
+    "⚠️  Anki Connection Required  ⚠️",
+    "",
+    "Make sure Anki is running and AnkiConnect is enabled.",
+    "The application expects AnkiConnect to be accessible at:",
+    "→ http://localhost:8765"
+};
+
+var width = messageLines.Select(line => line.Length).Prepend(0).Max();
+var topBorder = "╔" + new string('═', width + 2) + "╗";
+var bottomBorder = "╚" + new string('═', width + 2) + "╝";
+
+Console.WriteLine(topBorder);
+
+foreach (var line in messageLines)
+{
+    var padding = width - line.Length;
+    var padLeft = padding / 2;
+    var padRight = padding - padLeft;
+    Console.WriteLine("║ " + new string(' ', padLeft) + line + new string(' ', padRight) + " ║");
+}
+
+Console.WriteLine(bottomBorder);
 Console.ResetColor();
 
 Console.WriteLine("Hey. What is the file path to generate the flashcards?");
