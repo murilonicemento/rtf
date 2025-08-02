@@ -36,12 +36,12 @@ foreach (var line in messageLines)
     var padding = width - line.Length;
     var padLeft = padding / 2;
     var padRight = padding - padLeft;
+    
     Console.WriteLine("║ " + new string(' ', padLeft) + line + new string(' ', padRight) + " ║");
 }
 
 Console.WriteLine(bottomBorder);
 Console.ResetColor();
-
 Console.WriteLine("Hey. What is the file path to generate the flashcards?");
 
 var filePath = Console.ReadLine();
@@ -49,6 +49,7 @@ var filePath = Console.ReadLine();
 while (string.IsNullOrEmpty(filePath))
 {
     Console.WriteLine("File path can't be blank. What is the file path to generate the flashcards?");
+    
     filePath = Console.ReadLine();
 }
 
@@ -115,7 +116,7 @@ while (string.IsNullOrEmpty(deckName))
 Console.Clear();
 
 var cts = new CancellationTokenSource();
-var deckLoading = ShowLoading("Generating", cts.Token);
+var loading = ShowLoading("Generating", cts.Token);
 var httpClient = new HttpClient();
 
 const string ankiUrl = "http://localhost:8765";
@@ -225,7 +226,7 @@ var ankiAddNotesResult = JsonSerializer.Deserialize<AnkiResponse<List<long>>>(an
 
 cts.Cancel();
 
-await deckLoading;
+await loading;
 
 if (ankiAddNotesResult?.Error is not null)
 {
