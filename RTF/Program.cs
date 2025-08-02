@@ -17,6 +17,8 @@ while (string.IsNullOrEmpty(filePath))
     filePath = Console.ReadLine();
 }
 
+Console.Clear();
+
 var userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 var path = $"{userRootPath}\\{filePath}";
 
@@ -74,6 +76,10 @@ while (string.IsNullOrEmpty(deckName))
     deckName = Console.ReadLine();
 }
 
+Console.Clear();
+
+var cts = new CancellationTokenSource();
+var deckLoading = ShowLoading("Generating", cts.Token);
 var httpClient = new HttpClient();
 
 const string ankiUrl = "http://localhost:8765";
@@ -144,7 +150,7 @@ var requestBody = new
     }
 };
 
-var geminiResponse = await httpClient.PostAsJsonAsync($"{geminiOptions.Url}{geminiOptions.ApiKey}", requestBody);
+var geminiResponse = await httpClient.PostAsJsonAsync($"{geminiOptions.Url}?key={geminiOptions.ApiKey}", requestBody);
 
 if (!geminiResponse.IsSuccessStatusCode)
 {
@@ -181,6 +187,10 @@ ankiAddNoteResponse.EnsureSuccessStatusCode();
 var ankiAddNotesStringResult = await ankiAddNoteResponse.Content.ReadAsStringAsync();
 var ankiAddNotesResult = JsonSerializer.Deserialize<AnkiResponse<List<long>>>(ankiAddNotesStringResult);
 
+cts.Cancel();
+
+await deckLoading;
+
 if (ankiAddNotesResult?.Error is not null)
 {
     Console.WriteLine("Error occurred while adding flashcards to Anki.");
@@ -189,3 +199,25 @@ if (ankiAddNotesResult?.Error is not null)
 }
 
 Console.WriteLine("Operation performed successfully. Sayonara!");
+
+return;
+
+static async Task ShowLoading(string message, CancellationToken token)
+{
+    var sequence = new[] { "|", "/", "-", "\\" };
+    var counter = 0;
+
+    Console.Write($"{message} ");
+
+    while (!token.IsCancellationRequested)
+    {
+        Console.Write(sequence[counter % sequence.Length]);
+        Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+
+        counter++;
+
+        await Task.Delay(100);
+    }
+
+    Console.Clear();
+}
